@@ -23,16 +23,27 @@ public class JwtService {
         return Keys.hmacShaKeyFor(jwtSecretKey.getBytes(StandardCharsets.UTF_8));
     }
 
-    public String generateTaken(User user){
+    public String generateAccessTaken(User user){
          return Jwts.builder()
                 .setSubject(user.getId().toString())
                 .claim("email",user.getEmail())
                 .claim("roles", Set.of("ADMIN","USER"))
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis()+1000*60))
+                .setExpiration(new Date(System.currentTimeMillis()+1000*60*10))
                 .signWith(getSecretKey())
                 .compact();
     }
+
+    public String generateRefreshTaken(User user){
+        return Jwts.builder()
+                .setSubject(user.getId().toString())
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis()+1000L *60*60*24*30*12))
+                .signWith(getSecretKey())
+                .compact();
+    }
+
+
 
     public Long getUserIdFromToken(String token){
         Claims claims = Jwts
